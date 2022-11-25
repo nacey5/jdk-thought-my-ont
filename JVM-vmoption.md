@@ -949,5 +949,848 @@ This option is equivalent to `-Xss`.该选项等同于`-Xss`.
     
 
 <a id="Advanced_JIT_Compiler_Options"></a>**Advanced JIT Compiler Options**
+These options control the dynamic just-in-time (JIT) compilation performed by the Java HotSpot VM.
+这些选项控制由 Java HotSpot VM 执行的动态即时 (JIT) 编译。
+- **-XX:+AggressiveOpts**
+    Enables the use of aggressive performance optimization features, which are expected to become default in upcoming releases. By default, this option is disabled and experimental performance features are not used.
+    启用积极的性能优化功能，这些功能有望在即将发布的版本中成为默认功能。默认情况下，此选项处于禁用状态，并且不使用实验性性能功能。
+
+- **-XX:AllocateInstancePrefetchLines=lines**
+    Sets the number of lines to prefetch ahead of the instance allocation pointer. By default, the number of lines to prefetch is set to 1:
+    设置要在实例分配指针之前预取的行数。默认情况下，要预取的行数设置为 1：
+
+        -XX:AllocateInstancePrefetchLines=1
+        
+    Only the Java HotSpot Server VM supports this option.
+    只有 Java HotSpot Server VM 支持此选项。
+- **-XX:AllocatePrefetchDistance=size**
+    Sets the size (in bytes) of the prefetch distance for object allocation. Memory about to be written with the value of new objects is prefetched up to this distance starting from the address of the last allocated object. Each Java thread has its own allocation point.
+
+    Negative values denote that prefetch distance is chosen based on the platform. Positive values are bytes to prefetch. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. The default value is set to -1.
+    设置对象分配的预取距离的大小（以字节为单位）。将要用新对象的值写入的内存从最后分配的对象的地址开始预取到这个距离。每个 Java 线程都有自己的分配点。
+
+    负值表示预取距离是根据平台选择的。正值是要预取的字节。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。默认值设置为 -1。
+
+    The following example shows how to set the prefetch distance to 1024 bytes:
+    以下示例显示如何将预取距离设置为 1024 字节：
+
+        -XX:AllocatePrefetchDistance=1024
+        
+    Only the Java HotSpot Server VM supports this option.
+
+- **-XX:AllocatePrefetchInstr=instruction**
+    Sets the prefetch instruction to prefetch ahead of the allocation pointer. Only the Java HotSpot Server VM supports this option. Possible values are from 0 to 3. The actual instructions behind the values depend on the platform. By default, the prefetch instruction is set to 0:
+    将预取指令设置为在分配指针之前预取。只有 Java HotSpot Server VM 支持此选项。可能的值是从 0 到 3。值背后的实际说明取决于平台。默认情况下，预取指令设置为 0：
+
+        -XX:AllocatePrefetchInstr=0
+    Only the Java HotSpot Server VM supports this option.
+
+- **-XX:AllocatePrefetchLines=lines**
+    Sets the number of cache lines to load after the last object allocation by using the prefetch instructions generated in compiled code. The default value is 1 if the last allocated object was an instance, and 3 if it was an array.
+    使用编译代码中生成的预取指令，设置在最后一次对象分配后加载的缓存行数。如果最后分配的对象是实例，则默认值为 1，如果是数组，则默认值为 3。
+
+    The following example shows how to set the number of loaded cache lines to 5:
+    以下示例显示如何将加载的缓存行数设置为 5：
+
+        -XX:AllocatePrefetchLines=5
+    Only the Java HotSpot Server VM supports this option.
+    
+- **-XX:AllocatePrefetchStepSize=size**
+    Sets the step size (in bytes) for sequential prefetch instructions. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. By default, the step size is set to 16 bytes:
+    设置顺序预取指令的步长（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。默认情况下，步长设置为 16 个字节：
+        -XX:AllocatePrefetchStepSize=16
+    Only the Java HotSpot Server VM supports this option.
+
+- **-XX:AllocatePrefetchStyle=style**
+    Sets the generated code style for prefetch instructions. The style argument is an integer from 0 to 3:
+
+    - 0
+    Do not generate prefetch instructions.
+    不生成预取指令。
+
+    - 1
+    Execute prefetch instructions after each allocation. This is the default parameter.
+    每次分配后执行预取指令。这是默认参数。
+
+    - 2
+    Use the thread-local allocation block (TLAB) watermark pointer to determine when prefetch instructions are executed.
+    使用线程本地分配块 (TLAB) 水印指针来确定何时执行预取指令。
+
+    - 3
+    Use BIS instruction on SPARC for allocation prefetch.
+    在 SPARC 上使用 BIS 指令进行分配预取。
+
+    Only the Java HotSpot Server VM supports this option.
+
+- **-XX:+BackgroundCompilation**
+    Enables background compilation. This option is enabled by default. To disable background compilation, specify -XX:-BackgroundCompilation (this is equivalent to specifying -Xbatch).
+    启用后台编译。默认情况下启用此选项。要禁用后台编译，请指定`-XX:-BackgroundCompilation`（这等同于指定`-Xbatch`）。
+
+- **-XX:CICompilerCount=threads**
+    Sets the number of compiler threads to use for compilation. By default, the number of threads is set to 2 for the server JVM, to 1 for the client JVM, and it scales to the number of cores if tiered compilation is used. The following example shows how to set the number of threads to 2:
+    设置用于编译的编译器线程数。默认情况下，服务器 JVM 的线程数设置为 2，客户端 JVM 的线程数设置为 1，如果使用分层编译，它会扩展到核心数。以下示例显示如何将线程数设置为 2：
+
+        -XX:CICompilerCount=2
+        
+- **-XX:CodeCacheMinimumFreeSpace=size**
+    Sets the minimum free space (in bytes) required for compilation. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. When less than the minimum free space remains, compiling stops. By default, this option is set to 500 KB. The following example shows how to set the minimum free space to 1024 MB:
+    设置编译所需的最小可用空间（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。当剩余空间小于最小可用空间时，编译停止。默认情况下，此选项设置为 500 KB。以下示例显示如何将最小可用空间设置为 1024 MB：
+
+        -XX:CodeCacheMinimumFreeSpace=1024m
+
+- **-XX:CompileCommand=command,method[,option]**
+    Specifies a command to perform on a method. For example, to exclude the indexOf() method of the String class from being compiled, use the following:
+    指定要对方法执行的命令。例如，要从编译中排除类的indexOf()方法String，请使用以下内容：
+
+        -XX:CompileCommand=exclude,java/lang/String.indexOf
+    Note that the full class name is specified, including all packages and subpackages separated by a slash (/). For easier cut and paste operations, it is also possible to use the method name format produced by the -XX:+PrintCompilation and -XX:+LogCompilation options:
+    请注意，已指定完整的类名，包括所有由斜杠 ( /) 分隔的包和子包。为了更轻松地进行剪切和粘贴操作，还可以使用由-XX:+PrintCompilation和-XX:+LogCompilation选项生成的方法名称格式：
+
+        -XX:CompileCommand=exclude,java.lang.String::indexOf
+        
+    If the method is specified without the signature, the command will be applied to all methods with the specified name. However, you can also specify the signature of the method in the class file format. In this case, you should enclose the arguments in quotation marks, because otherwise the shell treats the semicolon as command end. For example, if you want to exclude only the indexOf(String) method of the String class from being compiled, use the following:
+    如果指定的方法没有签名，则该命令将应用于具有指定名称的所有方法。但是，您也可以在类文件格式中指定方法的签名。在这种情况下，您应该将参数括在引号中，否则 shell 会将分号视为命令结束。例如，如果您只想排除类的indexOf(String)方法String被编译，请使用以下内容：
+
+        -XX:CompileCommand="exclude,java/lang/String.indexOf,(Ljava/lang/String;)I"
+    You can also use the asterisk (*) as a wildcard for class and method names. For example, to exclude all indexOf() methods in all classes from being compiled, use the following:
+    您还可以使用星号 (*) 作为类和方法名称的通配符。例如，要排除indexOf()编译所有类中的所有方法，请使用以下命令：
+
+        -XX:CompileCommand=exclude,*.indexOf
+        
+    The commas and periods are aliases for spaces, making it easier to pass compiler commands through a shell. You can pass arguments to -XX:CompileCommand using spaces as separators by enclosing the argument in quotation marks:
+    逗号和句点是空格的别名，可以更轻松地通过 shell 传递编译器命令。您可以通过`-XX:CompileCommand`将参数括在引号中来将参数传递给使用空格作为分隔符：
+
+        -XX:CompileCommand="exclude java/lang/String indexOf"
+        
+    Note that after parsing the commands passed on the command line using the -XX:CompileCommand options, the JIT compiler then reads commands from the .hotspot_compiler file. You can add commands to this file or specify a different file using the -XX:CompileCommandFile option.
+    请注意，在使用选项解析命令行上传递的命令后-XX:CompileCommand，JIT 编译器随后会从.hotspot_compiler文件中读取命令。您可以将命令添加到此文件或使用该-XX:CompileCommandFile选项指定不同的文件。
+
+
+    To add several commands, either specify the -XX:CompileCommand option multiple times, or separate each argument with the newline separator (\n). The following commands are available:
+    要添加多个命令，请-XX:CompileCommand多次指定选项，或使用换行符 ( ) 分隔每个参数\n。以下命令可用：
+
+    - **break**
+        Set a breakpoint when debugging the JVM to stop at the beginning of compilation of the specified method.
+        调试JVM时设置断点，在指定方法开始编译时停止。
+
+    - **compileonly**
+        Exclude all methods from compilation except for the specified method. As an alternative, you can use the -XX:CompileOnly option, which allows to specify several methods.
+        从编译中排除除指定方法之外的所有方法。作为替代方案，您可以使用`-XX:CompileOnly`允许指定多种方法的选项。
+
+    - **dontinline**
+        Prevent inlining of the specified method.
+        防止内联指定的方法。
+
+    - **exclude**
+        Exclude the specified method from compilation.
+        从编译中排除指定的方法。
+
+    - **help**
+        Print a help message for the -XX:CompileCommand option.
+        打印该`-XX:CompileCommand`选项的帮助消息。
+
+    - **inline**
+        Attempt to inline the specified method.
+        尝试内联指定的方法。
+
+    - **log**
+        Exclude compilation logging (with the -XX:+LogCompilation option) for all methods except for the specified method. By default, logging is performed for all compiled methods.
+        排除除指定方法之外的所有方法的编译日志记录（使用 `-XX:+LogCompilation option`）。 默认情况下，对所有编译方法执行日志记录。
+
+    - **option**
+        This command can be used to pass a JIT compilation option to the specified method in place of the last argument (option). The compilation option is set at the end, after the method name. For example, to enable the BlockLayoutByFrequency option for the append() method of the StringBuffer class, use the following:
+        此命令可用于将 JIT 编译选项传递给指定的方法，以代替最后一个参数（选项）。 编译选项设置在最后，在方法名称之后。 例如，要为 StringBuffer 类的 append() 方法启用 BlockLayoutByFrequency 选项，请使用以下命令：
+
+            -XX:CompileCommand=option,java/lang/StringBuffer.append,BlockLayoutByFrequency
+        You can specify multiple compilation options, separated by commas or spaces.
+        您可以指定多个编译选项，以逗号或空格分隔。
+
+    - **print**
+        Print generated assembler code after compilation of the specified method.
+        编译指定方法后打印生成的汇编代码。
+
+    - **quiet**
+        Do not print the compile commands. By default, the commands that you specify with the -XX:CompileCommand option are printed; for example, if you exclude from compilation the `indexOf()` method of the String class, then the following will be printed to standard output:
+        不要打印编译命令。 默认情况下，打印您使用 `-XX:CompileCommand option`指定的命令； 例如，如果您从编译中排除 String 类的 indexOf() 方法，则以下内容将打印到标准输出：
+        
+            CompilerOracle: exclude java/lang/String.indexOf
+        You can suppress this by specifying the -XX:CompileCommand=quiet option before other `-XX:CompileCommand options`.
+        您可以通过在其他`-XX:CompileCommand option`之前指定 `-XX:CompileCommand=quiet` 选项来抑制这种情况。
+
+- **-XX:CompileCommandFile=filename**
+    Sets the file from which JIT compiler commands are read. By default, the .hotspot_compiler file is used to store commands performed by the JIT compiler.
+    设置从中读取 JIT 编译器命令的文件。默认情况下，该.hotspot_compiler文件用于存储 JIT 编译器执行的命令。
+
+    Each line in the command file represents a command, a class name, and a method name for which the command is used. For example, this line prints assembly code for the toString() method of the String class:
+    命令文件中的每一行代表一个命令、一个类名和使用该命令的方法名。例如，此行打印类toString()方法的汇编代码String：
+
+        print java/lang/String toString
+    For more information about specifying the commands for the JIT compiler to perform on methods, see the -XX:CompileCommand option.
+    有关指定 JIT 编译器对方法执行的命令的更多信息，请参阅该`-XX:CompileCommand`选项。
+    
+- **-XX:CompileOnly=methods**
+    Sets the list of methods (separated by commas) to which compilation should be restricted. Only the specified methods will be compiled. Specify each method with the full class name (including the packages and subpackages). For example, to compile only the length() method of the String class and the size() method of the List class, use the following:
+    设置应限制编译的方法列表（以逗号分隔）。 只会编译指定的方法。 用完整的类名（包括包和子包）指定每个方法。 例如，要仅编译 String 类的 length() 方法和 List 类的 size() 方法，请使用以下代码：
+
+        -XX:CompileOnly=java/lang/String.length,java/util/List.size
+    Note that the full class name is specified, including all packages and subpackages separated by a slash (/). For easier cut and paste operations, it is also possible to use the method name format produced by the -XX:+PrintCompilation and -XX:+LogCompilation options:
+    请注意，已指定完整的类名，包括所有包和子包，并用斜杠 (/) 分隔。 为了更轻松地进行剪切和粘贴操作，还可以使用由 -XX:+PrintCompilation 和 -XX:+LogCompilation 选项生成的方法名称格式：
+    
+        -XX:CompileOnly=java.lang.String::length,java.util.List::size
+        
+    Although wildcards are not supported, you can specify only the class or package name to compile all methods in that class or package, as well as specify just the method to compile methods with this name in any class:
+    虽然不支持通配符，但您可以仅指定类或包名称来编译该类或包中的所有方法，也可以仅指定方法来编译任何类中具有此名称的方法：
+
+        -XX:CompileOnly=java/lang/String
+        -XX:CompileOnly=java/lang
+        -XX:CompileOnly=.length
+
+- **-XX:CompileThreshold=invocations**
+    Sets the number of interpreted method invocations before compilation. By default, in the server JVM, the JIT compiler performs 10,000 interpreted method invocations to gather information for efficient compilation. For the client JVM, the default setting is 1,500 invocations. This option is ignored when tiered compilation is enabled; see the option -XX:+TieredCompilation. The following example shows how to set the number of interpreted method invocations to 5,000:
+    设置编译前解释方法调用的数量。默认情况下，在服务器 JVM 中，JIT 编译器执行 10,000 次解释方法调用来收集信息以进行高效编译。对于客户端 JVM，默认设置为 1,500 次调用。启用分层编译时忽略此选项；查看选项-XX:+TieredCompilation。以下示例显示如何将解释方法调用的次数设置为 5,000：
+
+        -XX:CompileThreshold=5000
+    You can completely disable interpretation of Java methods before compilation by specifying the `-Xcomp`option.
+    您可以通过指定-Xcomp选项在编译之前完全禁用 Java 方法的解释。
+
+- **-XX:+DoEscapeAnalysis**
+    Enables the use of escape analysis. This option is enabled by default. To disable the use of escape analysis, specify -XX:-DoEscapeAnalysis. Only the Java HotSpot Server VM supports this option.
+    启用逃逸分析。 默认情况下启用此选项。 要禁用逃逸分析，请指定 `-XX:-DoEscapeAnalysis`。 只有 Java HotSpot Server VM 支持此选项。
+    
+- **-XX:InitialCodeCacheSize=size**
+    Sets the initial code cache size (in bytes). Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. The default value is set to 500 KB. The initial code cache size should be not less than the system's minimal memory page size. The following example shows how to set the initial code cache size to 32 KB:
+    设置初始代码缓存大小（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。默认值设置为 500 KB。初始代码缓存大小应不小于系统的最小内存页面大小。以下示例显示如何将初始代码缓存大小设置为 32 KB：
+
+        -XX:InitialCodeCacheSize=32k
+        
+- **-XX:+Inline**
+    Enables method inlining. This option is enabled by default to increase performance. To disable method inlining, specify `-XX:-Inline`.
+    启用方法内联。默认情况下启用此选项以提高性能。要禁用方法内联，请指定-XX:-Inline.
+
+- **-XX:InlineSmallCode=size**
+    Sets the maximum code size (in bytes) for compiled methods that should be inlined. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. Only compiled methods with the size smaller than the specified size will be inlined. By default, the maximum code size is set to 1000 bytes:
+    为应该内联的编译方法设置最大代码大小（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。只有大小小于指定大小的编译方法才会被内联。默认情况下，最大代码大小设置为 1000 字节：
+
+        -XX:InlineSmallCode=1000
+        
+- **-XX:+LogCompilation**
+    Enables logging of compilation activity to a file named hotspot.log in the current working directory. You can specify a different log file path and name using the -XX:LogFile option.
+    
+    允许将编译活动记录到hotspot.log在当前工作目录中命名的文件中。-XX:LogFile您可以使用该选项指定不同的日志文件路径和名称。
+
+    By default, this option is disabled and compilation activity is not logged. The `-XX:+LogCompilation` option has to be used together with the `-XX:+UnlockDiagnosticVMOptions` option that unlocks diagnostic JVM options.
+    
+    默认情况下，此选项被禁用并且不记录编译活动。 `-XX:+LogCompilation` 选项必须与用于解锁诊断 JVM 选项的 `-XX:+UnlockDiagnosticVMOptions` 选项一起使用。
+
+    You can enable verbose diagnostic output with a message printed to the console every time a method is compiled by using the `X:+PrintCompilation` option.
+    
+    您可以启用详细的诊断输出，并在每次使用该`-XX:+PrintCompilation`选项编译方法时向控制台打印一条消息。
+    
+- **-XX:MaxInlineSize=size**
+    Sets the maximum bytecode size (in bytes) of a method to be inlined. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. By default, the maximum bytecode size is set to 35 bytes:
+    设置要内联的方法的最大字节码大小（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。默认情况下，最大字节码大小设置为 35 个字节：
+
+        -XX:MaxInlineSize=35
+        
+- **-XX:MaxNodeLimit=nodes**
+    Sets the maximum number of nodes to be used during single method compilation. By default, the maximum number of nodes is set to 65,000:
+    设置在单一方法编译期间要使用的最大节点数。默认情况下，最大节点数设置为 65,000：
+
+        -XX:MaxNodeLimit=65000
+
+- **-XX:MaxTrivialSize=size**
+    Sets the maximum bytecode size (in bytes) of a trivial method to be inlined. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. By default, the maximum bytecode size of a trivial method is set to 6 bytes:
+    设置要内联的普通方法的最大字节码大小（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。默认情况下，普通方法的最大字节码大小设置为 6 个字节：
+
+        -XX:MaxTrivialSize=6
+
+- **-XX:+OptimizeStringConcat**
+    Enables the optimization of String concatenation operations. This option is enabled by default. To disable the optimization of String concatenation operations, specify -XX:-OptimizeStringConcat. Only the Java HotSpot Server VM supports this option.
+    启用String串联操作的优化。默认情况下启用此选项。要禁用String串联操作的优化，请指定`-XX:-OptimizeStringConcat`. 只有 Java HotSpot Server VM 支持此选项。
+
+- **-XX:+PrintAssembly**
+    Enables printing of assembly code for bytecoded and native methods by using the external disassembler.so library. This enables you to see the generated code, which may help you to diagnose performance issues.
+    disassembler.so通过使用外部库启用字节码和本机方法的汇编代码打印。这使您能够查看生成的代码，这可能有助于您诊断性能问题。
+
+    By default, this option is disabled and assembly code is not printed. The -XX:+PrintAssembly option has to be used together with the -XX:+UnlockDiagnosticVMOptions option that unlocks diagnostic JVM options.
+    默认情况下，该选项被禁用并且不打印汇编代码。 -XX:+PrintAssembly 选项必须与解锁诊断 JVM 选项的 -XX:+UnlockDiagnosticVMOptions 选项一起使用。
+
+- **-XX:+PrintCompilation**
+    Enables verbose diagnostic output from the JVM by printing a message to the console every time a method is compiled. This enables you to see which methods actually get compiled. By default, this option is disabled and diagnostic output is not printed.
+    每次编译方法时，通过向控制台打印一条消息，启用 JVM 的详细诊断输出。这使您能够查看实际编译了哪些方法。默认情况下，此选项被禁用并且不打印诊断输出。
+
+    您还可以使用该-XX:+LogCompilation选项将编译活动记录到文件中。
+
+    You can also log compilation activity to a file by using the -XX:+LogCompilation option.
+    
+- **-XX:+PrintInlining**
+    Enables printing of inlining decisions. This enables you to see which methods are getting inlined.
+
+    By default, this option is disabled and inlining information is not printed. The -XX:+PrintInlining option has to be used together with the -XX:+UnlockDiagnosticVMOptions option that unlocks diagnostic JVM options.
+    启用内联决策的打印。 这使您能够查看正在内联的方法。
+
+     默认情况下，此选项被禁用并且不打印内联信息。 -XX:+PrintInlining 选项必须与解锁诊断 JVM 选项的 -XX:+UnlockDiagnosticVMOptions 选项一起使用。
+     
+- **-XX:ReservedCodeCacheSize=size**
+    Sets the maximum code cache size (in bytes) for JIT-compiled code. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. The default maximum code cache size is 240 MB; if you disable tiered compilation with the option -XX:-TieredCompilation, then the default size is 48 MB. This option has a limit of 2 GB; otherwise, an error is generated. The maximum code cache size should not be less than the initial code cache size; see the option -XX:InitialCodeCacheSize. This option is equivalent to -Xmaxjitcodesize.
+    设置 JIT 编译代码的最大代码缓存大小（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。默认最大代码缓存大小为 240 MB；如果您使用选项禁用分层编译-XX:-TieredCompilation，则默认大小为 48 MB。此选项有 2 GB 的限制；否则，会产生错误。最大代码缓存大小不应小于初始代码缓存大小；查看选项-XX:InitialCodeCacheSize。该选项等同于-Xmaxjitcodesize.
+
+- **-XX:RTMAbortRatio=abort_ratio**
+    The RTM abort ratio is specified as a percentage (%) of all executed RTM transactions. If a number of aborted transactions becomes greater than this ratio, then the compiled code will be deoptimized. This ratio is used when the -XX:+UseRTMDeopt option is enabled. The default value of this option is 50. This means that the compiled code will be deoptimized if 50% of all transactions are aborted.
+    RTM 中止率指定为所有已执行 RTM 事务的百分比 (%)。如果中止事务的数量大于此比率，则编译代码将被取消优化。-XX:+UseRTMDeopt启用该选项时使用此比率。此选项的默认值为 50。这意味着如果 50% 的事务被中止，编译后的代码将被取消优化。
+
+- **-XX:RTMRetryCount=number_of_retries**
+    RTM locking code will be retried, when it is aborted or busy, the number of times specified by this option before falling back to the normal locking mechanism. The default value for this option is 5. The `-XX:UseRTMLocking` option must be enabled.
+    RTM 锁定代码将被重试，当它被中止或繁忙时，在回退到正常锁定机制之前该选项指定的次数。此选项的默认值为 5。`-XX:UseRTMLocking`必须启用该选项。
+
+- **-XX:-TieredCompilation**
+    Disables the use of tiered compilation. By default, this option is enabled. Only the Java HotSpot Server VM supports this option.
+    禁用分层编译。默认情况下，此选项已启用。只有 Java HotSpot Server VM 支持此选项。
+
+- **-XX:+UseAES**
+    Enables hardware-based AES intrinsics for Intel, AMD, and SPARC hardware. Intel Westmere (2010 and newer), AMD Bulldozer (2011 and newer), and SPARC (T4 and newer) are the supported hardware. UseAES is used in conjunction with UseAESIntrinsics.
+    为 Intel、AMD 和 SPARC 硬件启用基于硬件的 AES 内在函数。Intel Westmere（2010 及更新版本）、AMD Bulldozer（2011 及更新版本）和 SPARC（T4 及更新版本）是受支持的硬件。UseAES 与 UseAESIntrinsics 结合使用。
+
+- **-XX:+UseAESIntrinsics**
+    UseAES and UseAESIntrinsics flags are enabled by default and are supported only for Java HotSpot Server VM 32-bit and 64-bit. To disable hardware-based AES intrinsics, specify -XX:-UseAES -XX:-UseAESIntrinsics. For example, to enable hardware AES, use the following flags:
+    UseAES 和 UseAESIntrinsics 标志默认启用，并且仅支持 Java HotSpot Server VM 32 位和 64 位。要禁用基于硬件的 AES 内在函数，请指定-XX:-UseAES -XX:-UseAESIntrinsics. 例如，要启用硬件 AES，请使用以下标志：
+
+        -XX:+UseAES -XX:+UseAESIntrinsics
+    To support UseAES and UseAESIntrinsics flags for 32-bit and 64-bit use -server option to choose Java HotSpot Server VM. These flags are not supported on Client VM.
+    要支持 32 位和 64 位的 UseAES 和 UseAESIntrinsics 标志，请使用-server选项来选择 Java HotSpot Server VM。客户端 VM 不支持这些标志。
+    
+- **-XX:+UseCodeCacheFlushing**
+    Enables flushing of the code cache before shutting down the compiler. This option is enabled by default. To disable flushing of the code cache before shutting down the compiler, specify -XX:-UseCodeCacheFlushing.
+    在关闭编译器之前启用代码缓存的刷新。默认情况下启用此选项。要在关闭编译器之前禁用代码缓存刷新，请指定-XX:-UseCodeCacheFlushing.
+
+- **-XX:+UseCondCardMark**
+    Enables checking of whether the card is already marked before updating the card table. This option is disabled by default and should only be used on machines with multiple sockets, where it will increase performance of Java applications that rely heavily on concurrent operations. Only the Java HotSpot Server VM supports this option.
+    在更新卡片表之前启用检查卡片是否已被标记。默认情况下禁用此选项，并且只能在具有多个套接字的机器上使用，它将提高严重依赖并发操作的 Java 应用程序的性能。只有 Java HotSpot Server VM 支持此选项。
+
+- **-XX:+UseRTMDeopt**
+    Auto-tunes RTM locking depending on the abort ratio. This ratio is specified by -XX:RTMAbortRatio option. If the number of aborted transactions exceeds the abort ratio, then the method containing the lock will be deoptimized and recompiled with all locks as normal locks. This option is disabled by default. The -XX:+UseRTMLocking option must be enabled.
+    根据中止率自动调整 RTM锁定。该比率由-XX:RTMAbortRatio选项指定。如果中止事务的数量超过中止率，那么包含锁的方法将被去优化并重新编译，所有锁都作为普通锁。默认情况下禁用此选项。-XX:+UseRTMLocking必须启用该选项。
+
+- **-XX:+UseRTMLocking**
+    Generate Restricted Transactional Memory (RTM) locking code for all inflated locks, with the normal locking mechanism as the fallback handler. This option is disabled by default. Options related to RTM are only available for the Java HotSpot Server VM on x86 CPUs that support Transactional Synchronization Extensions (TSX).
+    为所有膨胀锁生成受限事务内存 (RTM) 锁定代码，使用正常锁定机制作为回退处理程序。默认情况下禁用此选项。与 RTM 相关的选项仅适用于支持事务同步扩展 (TSX) 的 x86 CPU 上的 Java HotSpot Server VM。
+
+    RTM is part of Intel's TSX, which is an x86 instruction set extension and facilitates the creation of multithreaded applications. RTM introduces the new instructions XBEGIN, XABORT, XEND, and XTEST. The XBEGIN and XEND instructions enclose a set of instructions to run as a transaction. If no conflict is found when running the transaction, the memory and register modifications are committed together at the XEND instruction. The XABORT instruction can be used to explicitly abort a transaction and the XEND instruction to check if a set of instructions are being run in a transaction.
+    RTM 是英特尔 TSX 的一部分，它是 x86 指令集扩展，有助于创建多线程应用程序。RTM 引入了新指令XBEGIN、XABORT、XEND和XTEST。XBEGIN和XEND指令包含一组作为事务运行的指令。如果在运行事务时没有发现冲突，则内存和寄存器修改将在XEND指令中一起提交。该XABORT指令可用于显式中止事务以及XEND检查一组指令是否正在事务中运行的指令。
+
+    A lock on a transaction is inflated when another thread tries to access the same transaction, thereby blocking the thread that did not originally request access to the transaction. RTM requires that a fallback set of operations be specified in case a transaction aborts or fails. An RTM lock is a lock that has been delegated to the TSX's system.
+    当另一个线程试图访问同一事务时，事务上的锁会膨胀，从而阻塞最初未请求访问该事务的线程。RTM 要求指定一组回退操作，以防事务中止或失败。RTM 锁是已委托给 TSX 系统的锁。
+
+    RTM improves performance for highly contended locks with low conflict in a critical region (which is code that must not be accessed by more than one thread concurrently). RTM also improves the performance of coarse-grain locking, which typically does not perform well in multithreaded applications. (Coarse-grain locking is the strategy of holding locks for long periods to minimize the overhead of taking and releasing locks, while fine-grained locking is the strategy of trying to achieve maximum parallelism by locking only when necessary and unlocking as soon as possible.) Also, for lightly contended locks that are used by different threads, RTM can reduce false cache line sharing, also known as cache line ping-pong. This occurs when multiple threads from different processors are accessing different resources, but the resources share the same cache line. As a result, the processors repeatedly invalidate the cache lines of other processors, which forces them to read from main memory instead of their cache.
+    RTM 提高了关键区域中具有低冲突的高度竞争锁的性能（这是不能被多个线程同时访问的代码）。RTM 还提高了粗粒度锁定的性能，粗粒度锁定通常在多线程应用程序中表现不佳。（粗粒度锁定是长时间持有锁以最小化获取和释放锁的开销的策略，而细粒度锁定是通过仅在必要时锁定并尽快解锁来尝试实现最大并行性的策略。 ) 此外，对于不同线程使用的轻度竞争锁，RTM 可以减少错误的缓存行共享，也称为缓存行乒乓。当来自不同处理器的多个线程正在访问不同的资源时，会发生这种情况，但资源共享相同的缓存行。结果，处理器反复使其他处理器的缓存行无效，这迫使它们从主内存而不是缓存中读取。
+
+- **-XX:+UseSHA**
+    Enables hardware-based intrinsics for SHA crypto hash functions for SPARC hardware. UseSHA is used in conjunction with the UseSHA1Intrinsics, UseSHA256Intrinsics, and UseSHA512Intrinsics options.
+    为 SPARC 硬件的 SHA 加密哈希函数启用基于硬件的内部函数。UseSHA与UseSHA1Intrinsics、UseSHA256Intrinsics和UseSHA512Intrinsics选项结合使用。
+
+    The UseSHA and UseSHA*Intrinsics flags are enabled by default, and are supported only for Java HotSpot Server VM 64-bit on SPARC T4 and newer.
+    和标志默认启用，并且仅支持 SPARC T4 和更新版本上的 Java HotSpot Server VM 64 位UseSHA。UseSHA*Intrinsics
+
+    This feature is only applicable when using the sun.security.provider.Sun provider for SHA operations.
+    此功能仅在使用sun.security.provider.Sun提供程序进行 SHA 操作时适用。
+
+    To disable all hardware-based SHA intrinsics, specify -XX:-UseSHA. To disable only a particular SHA intrinsic, use the appropriate corresponding option. For example: -XX:-UseSHA256Intrinsics.
+    要禁用所有基于硬件的 SHA 内在函数，请指定-XX:-UseSHA. 要仅禁用特定的 SHA 内在函数，请使用相应的相应选项。例如：-XX:-UseSHA256Intrinsics。
+    
+- **-XX:+UseSHA1Intrinsics**
+    Enables intrinsics for SHA-1 crypto hash function.
+    为 SHA-1 加密哈希函数启用内在函数。
+
+- **-XX:+UseSHA256Intrinsics**
+    Enables intrinsics for SHA-224 and SHA-256 crypto hash functions.
+    为 SHA-224 和 SHA-256 加密哈希函数启用内部函数。
+
+- **-XX:+UseSHA512Intrinsics**
+    Enables intrinsics for SHA-384 and SHA-512 crypto hash functions.
+    为 SHA-384 和 SHA-512 加密哈希函数启用内部函数。
+
+- **-XX:+UseSuperWord**
+    Enables the transformation of scalar operations into superword operations. This option is enabled by default. To disable the transformation of scalar operations into superword operations, specify -XX:-UseSuperWord. Only the Java HotSpot Server VM supports this option.
+    支持将标量运算转换为超字运算。默认情况下启用此选项。要禁止将标量运算转换为超字运算，请指定-XX:-UseSuperWord. 只有 Java HotSpot Server VM 支持此选项。
+
+        
+
 <a id="Advanced_Serviceability_Options"></a>**Advanced Serviceability Options**
+These options provide the ability to gather system information and perform extensive debugging.
+这些选项提供了收集系统信息和执行广泛调试的能力。
+
+- **-XX:+ExtendedDTraceProbes**
+    Enables additional dtrace tool probes that impact the performance. By default, this option is disabled and dtrace performs only standard probes.
+启用dtrace影响性能的其他工具探针。默认情况下，此选项被禁用并且dtrace仅执行标准探测。
+
+- **-XX:+HeapDumpOnOutOfMemoryError**
+    Enables the dumping of the Java heap to a file in the current directory by using the heap profiler (HPROF) when a java.lang.OutOfMemoryError exception is thrown. You can explicitly set the heap dump file path and name using the -XX:HeapDumpPath option. By default, this option is disabled and the heap is not dumped when an OutOfMemoryError exception is thrown.
+    java.lang.OutOfMemoryError抛出异常时，使用堆分析器 (HPROF) 启用将 Java 堆转储到当前目录中的文件。-XX:HeapDumpPath您可以使用该选项显式设置堆转储文件路径和名称。默认情况下，此选项被禁用，并且在OutOfMemoryError抛出异常时不会转储堆。
+
+- **-XX:HeapDumpPath=path**
+    Sets the path and file name for writing the heap dump provided by the heap profiler (HPROF) when the -XX:+HeapDumpOnOutOfMemoryError option is set. By default, the file is created in the current working directory, and it is named java_pidpid.hprof where pid is the identifier of the process that caused the error. The following example shows how to set the default file explicitly (%p represents the current process identificator):
+设置选项时，设置用于写入堆分析器 (HPROF) 提供的堆转储的路径和文件名-XX:+HeapDumpOnOutOfMemoryError。默认情况下，该文件在当前工作目录中创建，并命名为java_pidpid.hprof，其中pid是导致错误的进程的标识符。以下示例显示如何显式设置默认文件（%p代表当前进程标识符）：
+
+        -XX:HeapDumpPath=./java_pid%p.hprof
+    The following example shows how to set the heap dump file to /var/log/java/java_heapdump.hprof:
+    以下示例显示如何将堆转储文件设置为/var/log/java/java_heapdump.hprof：
+
+        -XX:HeapDumpPath=/var/log/java/java_heapdump.hprof
+        
+- **-XX:LogFile=path**
+    Sets the path and file name where log data is written. By default, the file is created in the current working directory, and it is named hotspot.log.
+设置写入日志数据的路径和文件名。默认情况下，该文件在当前工作目录中创建，并命名为hotspot.log.
+
+    The following example shows how to set the log file to /var/log/java/hotspot.log:
+    以下示例显示如何将日志文件设置为/var/log/java/hotspot.log：
+
+        -XX:LogFile=/var/log/java/hotspot.log
+        
+- **-XX:+PrintClassHistogram**
+    Enables printing of a class instance histogram after a Control+C event (SIGTERM). By default, this option is disabled.
+    Control+C在事件 ( SIGTERM)之后启用类实例直方图的打印。默认情况下，此选项被禁用。
+
+    Setting this option is equivalent to running the jmap -histo command, or the jcmd pid GC.class_histogram command, where pid is the current Java process identifier.
+    设置该选项等同于运行jmap -histo命令或jcmd pid GC.class_histogram命令，其中pid是当前 Java 进程标识符。
+    
+- **-XX:+PrintConcurrentLocks**
+    Enables printing of java.util.concurrent locks after a Control+C event (SIGTERM). By default, this option is disabled.
+    在 Control+C 事件 (SIGTERM) 之后启用 java.util.concurrent 锁的打印。 默认情况下，此选项被禁用。
+
+    Setting this option is equivalent to running the jstack -l command or the jcmd pid Thread.print -l command, where pid is the current Java process identifier.
+    设置该选项等同于运行 jstack -l 命令或 jcmd pid Thread.print -l 命令，其中 pid 是当前 Java 进程标识符。
+    
+- **-XX:+UnlockDiagnosticVMOptions**
+    Unlocks the options intended for diagnosing the JVM. By default, this option is disabled and diagnostic options are not available.
+    解锁用于诊断 JVM 的选项。默认情况下，此选项被禁用并且诊断选项不可用。
+
 <a id="Advanced_Garbage_Collection_Options"></a>**dvanced Garbage Collection Options**
+These options control how garbage collection (GC) is performed by the Java HotSpot VM.
+这些选项控制 Java HotSpot VM 执行垃圾收集 (GC) 的方式。
+
+- **-XX:ActiveProcessorCount=x**
+    Overrides the number of CPUs that the VM uses to calculate the size of thread pools it uses for various operations such as Garbage Collection and ForkJoinPool.
+    覆盖 VM 用于计算线程池大小的 CPU 数量，它用于各种操作，例如垃圾收集和 ForkJoinPool【入池】。
+
+    The VM normally determines the number of available processors from the operating system. This flag can be useful for partitioning CPU resources when running multiple Java processes in docker containers. This flag is honored even if UseContainerSupport is not enabled. See -XX:-UseContainerSupport for a description of enabling and disabling container support.
+    VM 通常从操作系统中确定可用处理器的数量。 在 docker 容器中运行多个 Java 进程时，此标志可用于分区 CPU 资源。 即使未启用 UseContainerSupport，也会使用此标志。 有关启用和禁用容器支持的说明，请参阅 -XX:-UseContainerSupport。
+
+- **-XX:+AggressiveHeap**
+    Enables Java heap optimization. This sets various parameters to be optimal for long-running jobs with intensive memory allocation, based on the configuration of the computer (RAM and CPU). By default, the option is disabled and the heap is not optimized.
+    启用 Java 堆优化。这会根据计算机的配置（RAM 和 CPU）为具有密集内存分配的长时间运行的作业设置最佳参数。默认情况下，该选项被禁用并且堆未被优化。
+
+- **-XX:+AlwaysPreTouch**
+    Enables touching of every page on the Java heap during JVM initialization. This gets all pages into the memory before entering the main() method. The option can be used in testing to simulate a long-running system with all virtual memory mapped to physical memory. By default, this option is disabled and all pages are committed as JVM heap space fills.
+    在 JVM 初始化期间启用接触 Java 堆上的每个页面。这将在进入该main()方法之前将所有页面放入内存。该选项可用于测试以模拟长时间运行的系统，其中所有虚拟内存都映射到物理内存。默认情况下，此选项被禁用，所有页面都在 JVM 堆空间填满时提交。
+
+- **-XX:+CMSClassUnloadingEnabled**
+    Enables class unloading when using the concurrent mark-sweep (CMS) garbage collector. This option is enabled by default. To disable class unloading for the CMS garbage collector, specify `-XX:-CMSClassUnloadingEnabled`.
+    使用并发标记清除 (CMS) 垃圾收集器时启用类卸载。默认情况下启用此选项。要禁用 CMS 垃圾收集器的类卸载，请指定-XX:-CMSClassUnloadingEnabled.
+
+- **-XX:CMSExpAvgFactor=percent**
+    Sets the percentage of time (0 to 100) used to weight the current sample when computing exponential averages for the concurrent collection statistics. By default, the exponential averages factor is set to 25%. The following example shows how to set the factor to 15%:
+    设置在计算并发收集统计信息的指数平均值时用于对当前样本加权的时间百分比（0 到 100）。默认情况下，指数平均因子设置为 25%。以下示例显示如何将因子设置为 15%：
+
+        -XX:CMSExpAvgFactor=15
+
+- **-XX:CMSInitiatingOccupancyFraction=percent**
+    Sets the percentage of the old generation occupancy (0 to 100) at which to start a CMS collection cycle. The default value is set to -1. Any negative value (including the default) implies that -XX:CMSTriggerRatio is used to define the value of the initiating occupancy fraction.
+    设置开始 CMS 收集周期的老年代占用百分比（0 到 100）。默认值设置为 -1。任何负值（包括默认值）都意味着`-XX:CMSTriggerRatio`用于定义初始占用率的值。
+
+    The following example shows how to set the occupancy fraction to 20%:
+    以下示例显示如何将占用率设置为 20%：
+
+        -XX:CMSInitiatingOccupancyFraction=20
+        
+- **-XX:+CMSScavengeBeforeRemark**
+    Enables scavenging attempts before the CMS remark step. By default, this option is disabled.
+    在 CMS 备注步骤之前启用清理尝试。默认情况下，此选项被禁用。
+
+- **-XX:CMSTriggerRatio=percent**
+    Sets the percentage (0 to 100) of the value specified by -XX:MinHeapFreeRatio that is allocated before a CMS collection cycle commences. The default value is set to 80%.
+    `-XX:MinHeapFreeRatio`设置在CMS 收集周期开始之前分配的指定值的百分比（0 到 100） 。默认值设置为 80%。
+
+    The following example shows how to set the occupancy fraction to 75%:
+    以下示例显示如何将占用率设置为 75%：
+
+        -XX:CMSTriggerRatio=75
+        
+- **-XX:ConcGCThreads=threads**
+    Sets the number of threads used for concurrent GC. The default value depends on the number of CPUs available to the JVM.
+    设置用于并发 GC 的线程数。默认值取决于 JVM 可用的 CPU 数量。
+
+    For example, to set the number of threads for concurrent GC to 2, specify the following option:
+    例如，要将并发 GC 的线程数设置为 2，请指定以下选项：
+
+        -XX:ConcGCThreads=2
+        
+- **-XX:+DisableExplicitGC**
+    Enables the option that disables processing of calls to System.gc(). This option is disabled by default, meaning that calls to System.gc() are processed. If processing of calls to System.gc() is disabled, the JVM still performs GC when necessary.
+    启用禁用对 的调用处理的选项System.gc()。默认情况下禁用此选项，这意味着System.gc()处理对的调用。如果禁用对调用的处理System.gc()，JVM 仍会在必要时执行 GC。
+
+- **-XX:+ExplicitGCInvokesConcurrent**
+    Enables invoking of concurrent GC by using the System.gc() request. This option is disabled by default and can be enabled only together with the -XX:+UseConcMarkSweepGC option.
+    通过使用System.gc()请求启用并发 GC 调用。默认情况下禁用此选项，只能与该-XX:+UseConcMarkSweepGC选项一起启用。
+
+- **-XX:+ExplicitGCInvokesConcurrentAndUnloadsClasses**
+    Enables invoking of concurrent GC by using the System.gc() request and unloading of classes during the concurrent GC cycle. This option is disabled by default and can be enabled only together with the -XX:+UseConcMarkSweepGC option.
+    System.gc()通过在并发 GC 周期中使用类的请求和卸载来启用并发 GC 的调用。默认情况下禁用此选项，只能与该-XX:+UseConcMarkSweepGC选项一起启用。
+
+- **-XX:G1HeapRegionSize=size**
+    Sets the size of the regions into which the Java heap is subdivided when using the garbage-first (G1) collector. The value can be between 1 MB and 32 MB. The default region size is determined ergonomically based on the heap size.
+    设置使用垃圾优先 (G1) 收集器时 Java 堆被细分的区域大小。该值可以介于 1 MB 和 32 MB 之间。默认区域大小是根据堆大小根据ergonomically(人体工程学-不知道是啥玩意)确定的。
+
+    The following example shows how to set the size of the subdivisions to 16 MB:
+    以下示例显示如何将细分的大小设置为 16 MB：
+
+        -XX:G1HeapRegionSize=16m
+        
+- **-XX:+G1PrintHeapRegions**
+    Enables the printing of information about which regions are allocated and which are reclaimed by the G1 collector. By default, this option is disabled.
+    启用有关哪些区域已分配以及哪些区域已由 G1 收集器回收的信息的打印。默认情况下，此选项被禁用。
+
+- **-XX:G1ReservePercent=percent**
+    Sets the percentage of the heap (0 to 50) that is reserved as a false ceiling to reduce the possibility of promotion failure for the G1 collector. By default, this option is set to 10%.
+    将保留的堆百分比（0 到 50）设置为假上限，以减少 G1 收集器提升失败的可能性。默认情况下，此选项设置为 10%。
+
+    The following example shows how to set the reserved heap to 20%:
+    以下示例显示如何将保留堆设置为 20%：
+
+        -XX:G1ReservePercent=20
+        
+- **-XX:InitialHeapSize=size**
+    Sets the initial size (in bytes) of the memory allocation pool. This value must be either 0, or a multiple of 1024 and greater than 1 MB. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. The default value is chosen at runtime based on system configuration. See the section "Ergonomics" in Java SE HotSpot Virtual Machine Garbage Collection Tuning Guide at http://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/index.html.
+    设置内存分配池的初始大小（以字节为单位）。此值必须为 0 或 1024 的倍数且大于 1 MB。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。默认值是在运行时根据系统配置选择的。请参阅Java SE HotSpot 虚拟机垃圾收集调优指南中的“人体工程学”部分http://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/index.html。
+
+    The following examples show how to set the size of allocated memory to 6 MB using various units:
+    以下示例显示如何使用各种单位将已分配内存的大小设置为 6 MB：
+
+        -XX:InitialHeapSize=6291456
+        -XX:InitialHeapSize=6144k
+        -XX:InitialHeapSize=6m
+    If you set this option to 0, then the initial size will be set as the sum of the sizes allocated for the old generation and the young generation. The size of the heap for the young generation can be set using the -XX:NewSize option.
+    如果将此选项设置为 0，则初始大小将设置为分配给老年代和年轻代的大小之和。可以使用该-XX:NewSize选项设置年轻代堆的大小。
+
+    Note that the -Xms option sets both the minimum and the initial heap size of the heap. If -Xms appears after -XX:InitialHeapSize on the command line, then the initial heap size gets set to the value specified with -Xms.
+    请注意，该-Xms选项设置堆的最小堆大小和初始堆大小。如果在命令行-Xms之后出现-XX:InitialHeapSize，则初始堆大小将设置为使用 指定的值-Xms。
+    
+- **-XX:InitialRAMPercentage=percent**
+    Sets the initial amount of memory that the JVM will use for the Java heap before applying ergonomics heuristics as a percentage of the maximum amount determined as described in the -XX:MaxRAM option. The default value is 1.5625 percent.
+    将 JVM 在应用人体工程学试探法之前用于 Java 堆的初始内存量设置为按-XX:MaxRAM选项中所述确定的最大内存量的百分比。默认值为 1.5625%。
+
+    The following example shows how to set the percentage of the initial amount of memory used for the Java heap:
+    以下示例显示如何设置用于 Java 堆的初始内存量的百分比：
+
+        -XX:InitialRAMPercentage=5
+        
+- **-XX:InitialSurvivorRatio=ratio**
+    Sets the initial survivor space ratio used by the throughput garbage collector (which is enabled by the -XX:+UseParallelGC and/or -XX:+UseParallelOldGC options). Adaptive sizing is enabled by default with the throughput garbage collector by using the -XX:+UseParallelGC and -XX:+UseParallelOldGC options, and survivor space is resized according to the application behavior, starting with the initial value. If adaptive sizing is disabled (using the -XX:-UseAdaptiveSizePolicy option), then the -XX:SurvivorRatio option should be used to set the size of the survivor space for the entire execution of the application.
+    设置吞吐量垃圾收集器使用的初始幸存者空间比率（由-XX:+UseParallelGC和/或 -XX:+UseParallelOldGC选项启用）。默认情况下，吞吐量垃圾收集器通过使用-XX:+UseParallelGC和-XX:+UseParallelOldGC选项启用自适应大小调整，并且根据应用程序行为调整幸存者空间的大小，从初始值开始。如果禁用自适应大小调整（使用该-XX:-UseAdaptiveSizePolicy选项），-XX:SurvivorRatio则应使用该选项为应用程序的整个执行设置幸存者空间的大小。
+
+    The following formula can be used to calculate the initial size of survivor space (S) based on the size of the young generation (Y), and the initial survivor space ratio (R):
+    根据年轻代的大小（Y）和初始幸存者空间比例（R），可以使用以下公式计算幸存者空间的初始大小（S）：
+
+        S=Y/(R+2)
+    The 2 in the equation denotes two survivor spaces. The larger the value specified as the initial survivor space ratio, the smaller the initial survivor space size.
+    等式中的 2 表示两个幸存者空间。指定为初始幸存者空间比例的值越大，初始幸存者空间大小越小。
+
+    By default, the initial survivor space ratio is set to 8. If the default value for the young generation space size is used (2 MB), the initial size of the survivor space will be 0.2 MB.
+    默认情况下，初始survivor空间比例设置为8。如果新生代空间大小使用默认值（2MB），则survivor空间的初始大小将为0.2MB。
+
+    The following example shows how to set the initial survivor space ratio to 4:
+    以下示例显示如何将初始幸存者空间比率设置为 4：
+
+        -XX:InitialSurvivorRatio=4
+    
+- **-XX:InitiatingHeapOccupancyPercent=percent**
+    Sets the percentage of the heap occupancy (0 to 100) at which to start a concurrent GC cycle. It is used by garbage collectors that trigger a concurrent GC cycle based on the occupancy of the entire heap, not just one of the generations (for example, the G1 garbage collector).
+    设置开始并发 GC 周期的堆占用百分比（0 到 100）。它被垃圾收集器使用，根据整个堆的占用情况触发并发 GC 周期，而不仅仅是其中一个代（例如，G1 垃圾收集器）
+
+    By default, the initiating value is set to 45%. A value of 0 implies nonstop GC cycles. The following example shows how to set the initiating heap occupancy to 75%:
+    默认情况下，初始值设置为 45%。值为 0 意味着不间断的 GC 周期。以下示例显示如何将启动堆占用率设置为 75%：
+
+        -XX:InitiatingHeapOccupancyPercent=75
+        
+- **-XX:MaxGCPauseMillis=time**
+    Sets a target for the maximum GC pause time (in milliseconds). This is a soft goal, and the JVM will make its best effort to achieve it. By default, there is no maximum pause time value.
+    设置最大 GC 暂停时间的目标（以毫秒为单位）。这是一个软目标，JVM 将尽最大努力实现它。默认情况下，没有最大暂停时间值。
+
+    The following example shows how to set the maximum target pause time to 500 ms:
+    以下示例显示如何将最大目标暂停时间设置为 500 毫秒：
+
+        -XX:MaxGCPauseMillis=500
+        
+- **-XX:MaxHeapSize=size**
+    Sets the maximum size (in byes) of the memory allocation pool. This value must be a multiple of 1024 and greater than 2 MB. Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. The default value is chosen at runtime based on system configuration. For server deployments, -XX:InitialHeapSize and -XX:MaxHeapSize are often set to the same value. See the section "Ergonomics" in Java SE HotSpot Virtual Machine Garbage Collection Tuning Guide at http://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/index.html.
+    设置内存分配池的最大大小（以字节为单位）。此值必须是 1024 的倍数且大于 2 MB。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。默认值是在运行时根据系统配置选择的。对于服务器部署，-XX:InitialHeapSize通常-XX:MaxHeapSize设置为相同的值。请参阅Java SE HotSpot 虚拟机垃圾收集调优指南中的“人体工程学”部分http://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/index.html。
+
+    The following examples show how to set the maximum allowed size of allocated memory to 80 MB using various units:
+    以下示例显示如何使用各种单位将分配内存的最大允许大小设置为 80 MB：
+
+        -XX:MaxHeapSize=83886080
+        -XX:MaxHeapSize=81920k
+        -XX:MaxHeapSize=80m
+    On Oracle Solaris 7 and Oracle Solaris 8 SPARC platforms, the upper limit for this value is approximately 4,000 MB minus overhead amounts. On Oracle Solaris 2.6 and x86 platforms, the upper limit is approximately 2,000 MB minus overhead amounts. On Linux platforms, the upper limit is approximately 2,000 MB minus overhead amounts.
+    在 Oracle Solaris 7 和 Oracle Solaris 8 SPARC 平台上，此值的上限约为 4,000 MB 减去开销量。在 Oracle Solaris 2.6 和 x86 平台上，上限约为 2,000 MB 减去开销量。在 Linux 平台上，上限约为 2,000 MB 减去开销量。
+
+    The -XX:MaxHeapSize option is equivalent to `-Xmx`.
+    该-XX:MaxHeapSize选项相当于-Xmx.
+- **-XX:MaxHeapFreeRatio=percent**
+    Sets the maximum allowed percentage of free heap space (0 to 100) after a GC event. If free heap space expands above this value, then the heap will be shrunk. By default, this value is set to 70%.
+    设置 GC 事件后可用堆空间的最大允许百分比（0 到 100）。如果可用堆空间扩展到该值以上，则堆将收缩。默认情况下，此值设置为 70%。
+
+    The following example shows how to set the maximum free heap ratio to 75%:
+    以下示例显示如何将最大可用堆比率设置为 75%：
+
+        -XX:MaxHeapFreeRatio=75
+        
+- **-XX:MaxMetaspaceSize=size**
+    Sets the maximum amount of native memory that can be allocated for class metadata. By default, the size is not limited. The amount of metadata for an application depends on the application itself, other running applications, and the amount of memory available on the system.
+    设置可以分配给类元数据的最大本机内存量。默认情况下，大小不受限制。应用程序的元数据量取决于应用程序本身、其他正在运行的应用程序以及系统上可用的内存量。
+
+    The following example shows how to set the maximum class metadata size to 256 MB:
+    以下示例显示如何将最大类元数据大小设置为 256 MB：
+
+        -XX:MaxMetaspaceSize=256m
+
+- **-XX:MaxNewSize=size**
+    Sets the maximum size (in bytes) of the heap for the young generation (nursery). The default value is set ergonomically.
+    为年轻一代（新生代）设置堆的最大大小（以字节为单位）。 默认值是根据人体工程学设置的。
+    
+- **-XX:MaxRAMPercentage=percent**
+    Sets the maximum amount of memory that the JVM may use for the Java heap before applying ergonomics heuristics as a percentage of the maximum amount determined as described in the -XX:MaxRAM option. The default value is 25 percent.
+    将 JVM 在应用人体工程学试探法之前可用于 Java 堆的最大内存量设置为按-XX:MaxRAM选项中所述确定的最大内存量的百分比。默认值为 25%。
+
+    Specifying this option disables automatic use of compressed oops if the combined result of this and other options influencing the maximum amount of memory is larger than the range of memory addressable by compressed oops. See `-XX:UseCompressedOops` for further information about compressed oops.
+    如果此选项和影响最大内存量的其他选项的组合结果大于压缩 oops 可寻址的内存范围，则指定此选项将禁用压缩 oops 的自动使用。有关压缩 oops 的更多信息，请参阅`XX:UseCompressedOops`。
+
+    The following example shows how to set the percentage of the maximum amount of memory used for the Java heap:
+    以下示例显示如何设置用于 Java 堆的最大内存量的百分比：
+
+        -XX:MaxRAMPercentage=75
+        
+- **-XX:MaxTenuringThreshold=threshold**
+    Sets the maximum tenuring threshold for use in adaptive GC sizing. The largest value is 15. The default value is 15 for the parallel (throughput) collector, and 6 for the CMS collector.
+    设置用于自适应 GC 大小调整的最大使用期阈值。最大值为 15。并行（吞吐量）收集器的默认值为 15，CMS 收集器的默认值为 6。
+
+    The following example shows how to set the maximum tenuring threshold to 10:
+    以下示例显示如何将最大任期阈值设置为 10：
+
+        -XX:MaxTenuringThreshold=10
+
+- **-XX:MetaspaceSize=size**
+    Sets the size of the allocated class metadata space that will trigger a garbage collection the first time it is exceeded. This threshold for a garbage collection is increased or decreased depending on the amount of metadata used. The default size depends on the platform.
+    设置分配的类元数据空间的大小，该空间将在第一次超出时触发垃圾回收。垃圾回收的阈值根据使用的元数据量增加或减少。默认大小取决于平台。
+
+- **-XX:MinHeapFreeRatio=percent**
+    Sets the minimum allowed percentage of free heap space (0 to 100) after a GC event. If free heap space falls below this value, then the heap will be expanded. By default, this value is set to 40%.
+    设置 GC 事件后可用堆空间的最小允许百分比（0 到 100）。如果可用堆空间低于此值，则将扩展堆。默认情况下，此值设置为 40%。
+
+    The following example shows how to set the minimum free heap ratio to 25%:
+    以下示例显示如何将最小空闲堆比率设置为 25%：
+
+        -XX:MinHeapFreeRatio=25
+    
+- **-XX:MinRAMPercentage=percent**
+    Sets the maximum amount of memory that the JVM may use for the Java heap before applying ergonomics heuristics as a percentage of the maximum amount determined as described in the -XX:MaxRAM option for small heaps. A small heap is a heap of approximately 125 MB. The default value is 50 percent.
+    将 JVM 在应用人体工程学试探法之前可用于 Java 堆的最大内存量设置为最大内存量的百分比，如-XX:MaxRAM小堆选项中所述。小堆是大约 125 MB 的堆。默认值为 50%。
+
+    The following example shows how to set the percentage of the maximum amount of memory used for the Java heap for small heaps:
+    以下示例显示了如何设置用于小型堆的 Java 堆的最大内存量的百分比：
+
+        -XX:MinRAMPercentage=75
+
+- **-XX:NewRatio=ratio**
+    Sets the ratio between young and old generation sizes. By default, this option is set to 2. The following example shows how to set the young/old ratio to 1:
+    设置年轻代和老年代大小之间的比例。默认情况下，此选项设置为 2。以下示例显示如何将年轻/年老比率设置为 1：
+
+        -XX:NewRatio=1
+        
+- **-XX:NewSize=size**
+    Sets the initial size (in bytes) of the heap for the young generation (nursery). Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes.
+    为年轻一代（新生代）设置堆的初始大小（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。
+
+    The young generation region of the heap is used for new objects. GC is performed in this region more often than in other regions. If the size for the young generation is too low, then a large number of minor GCs will be performed. If the size is too high, then only full GCs will be performed, which can take a long time to complete. Oracle recommends that you keep the size for the young generation between a half and a quarter of the overall heap size.
+    堆的年轻代区域用于新对象。GC 在这个区域比在其他区域更频繁地执行。如果年轻代的大小太小，那么将会执行大量的次要 GC。如果大小太高，则只会执行完整的 GC，这可能需要很长时间才能完成。Oracle 建议您将新生代的大小保持在整个堆大小的一半到四分之一之间。
+
+    The following examples show how to set the initial size of young generation to 256 MB using various units:
+    以下示例显示如何使用各种单位将年轻代的初始大小设置为 256 MB：
+
+        -XX:NewSize=256m
+        -XX:NewSize=262144k
+        -XX:NewSize=268435456
+    The -XX:NewSize option is equivalent to -Xmn.
+    该-XX:NewSize选项相当于-Xmn.
+    
+- **-XX:ParallelGCThreads=threads**
+    Sets the number of threads used for parallel garbage collection in the young and old generations. The default value depends on the number of CPUs available to the JVM.
+    设置用于年轻代和老年代并行垃圾回收的线程数。默认值取决于 JVM 可用的 CPU 数量。
+
+    For example, to set the number of threads for parallel GC to 2, specify the following option:
+    例如，要将并行 GC 的线程数设置为 2，请指定以下选项：
+
+        -XX:ParallelGCThreads=2
+        
+- **-XX:+ParallelRefProcEnabled**
+    Enables parallel reference processing. By default, this option is disabled.
+    启用并行引用处理。默认情况下，此选项被禁用。
+
+- **-XX:+PrintAdaptiveSizePolicy**
+    Enables printing of information about adaptive generation sizing. By default, this option is disabled.
+    启用有关自适应生成大小调整的信息的打印。默认情况下，此选项被禁用。
+
+- **-XX:+PrintGC**
+    Enables printing of messages at every GC. By default, this option is disabled.
+    在每次 GC 时启用消息打印。默认情况下，此选项被禁用。
+
+- **-XX:+PrintGCApplicationConcurrentTime**
+    Enables printing of how much time elapsed since the last pause (for example, a GC pause). By default, this option is disabled.
+    启用打印自上次暂停（例如，GC 暂停）以来经过的时间。默认情况下，此选项被禁用。
+
+- **-XX:+PrintGCApplicationStoppedTime**
+    Enables printing of how much time the pause (for example, a GC pause) lasted. By default, this option is disabled.
+    允许打印暂停（例如，GC 暂停）持续了多长时间。默认情况下，此选项被禁用。
+
+- **-XX:+PrintGCDateStamps**
+    Enables printing of a date stamp at every GC. By default, this option is disabled.
+    启用在每个 GC 上打印日期戳。默认情况下，此选项被禁用。
+
+- **-XX:+PrintGCDetails**
+    Enables printing of detailed messages at every GC. By default, this option is disabled.
+    允许在每次 GC 时打印详细消息。默认情况下，此选项被禁用。
+
+- **-XX:+PrintGCTaskTimeStamps**
+    Enables printing of time stamps for every individual GC worker thread task. By default, this option is disabled.
+    为每个单独的 GC 工作线程任务启用时间戳打印。默认情况下，此选项被禁用。
+
+- **-XX:+PrintGCTimeStamps**
+    Enables printing of time stamps at every GC. By default, this option is disabled.
+    在每个 GC 上启用时间戳打印。默认情况下，此选项被禁用。
+
+- **-XX:+PrintStringDeduplicationStatistics**
+    Prints detailed deduplication statistics. By default, this option is disabled. See the -XX:+UseStringDeduplication option.
+    打印详细的重复数据删除统计信息。默认情况下，此选项被禁用。查看`-XX:+UseStringDeduplication`选项。
+
+- **-XX:+PrintTenuringDistribution**
+    Enables printing of tenuring age information. The following is an example of the output:
+    启用终身年龄信息的打印。以下是输出示例：
+
+        Desired survivor size 48286924 bytes, new threshold 10 (max 10)
+        - age 1: 28992024 bytes, 28992024 total
+        - age 2: 1366864 bytes, 30358888 total
+        - age 3: 1425912 bytes, 31784800 total
+        ...
+    Age 1 objects are the youngest survivors (they were created after the previous scavenge, survived the latest scavenge, and moved from eden to survivor space). Age 2 objects have survived two scavenges (during the second scavenge they were copied from one survivor space to the next). And so on.
+    年龄为 1 的对象是最年轻的幸存者（它们是在上一次清除之后创建的，在最近一次清除中幸存下来，并从伊甸园移动到幸存者空间）。年龄 2 的对象在两次清除中幸存下来（在第二次清除期间，它们被从一个幸存者空间复制到下一个幸存者空间）。等等。
+
+    In the preceding example, 28 992 024 bytes survived one scavenge and were copied from eden to survivor space, 1 366 864 bytes are occupied by age 2 objects, etc. The third value in each row is the cumulative size of objects of age n or less.
+    在前面的示例中，有 28 992 024 字节在一次清除后幸存并从伊甸园复制到幸存者空间，1 366 864 字节被年龄为 2 的对象占用，等等。每行中的第三个值是年龄为 n 或较少的。
+
+    By default, this option is disabled.
+    默认情况下，此选项被禁用。
+
+- **-XX:+ScavengeBeforeFullGC**
+    Enables GC of the young generation before each full GC. This option is enabled by default. Oracle recommends that you do not disable it, because scavenging the young generation before a full GC can reduce the number of objects reachable from the old generation space into the young generation space. To disable GC of the young generation before each full GC, specify -XX:-ScavengeBeforeFullGC.
+    在每次完整 GC 之前启用年轻代的 GC。 默认情况下启用此选项。 Oracle 建议您不要禁用它，因为在 full GC 之前清除年轻代会减少从老年代空间到达年轻代空间的对象数量。 要在每次完整 GC 之前禁用年轻代的 GC，请指定 `-XX:-ScavengeBeforeFullGC`。
+
+- ** -XX:SoftRefLRUPolicyMSPerMB=time**
+    Sets the amount of time (in milliseconds) a softly reachable object is kept active on the heap after the last time it was referenced. The default value is one second of lifetime per free megabyte in the heap. The -XX:SoftRefLRUPolicyMSPerMB option accepts integer values representing milliseconds per one megabyte of the current heap size (for Java HotSpot Client VM) or the maximum possible heap size (for Java HotSpot Server VM). This difference means that the Client VM tends to flush soft references rather than grow the heap, whereas the Server VM tends to grow the heap rather than flush soft references. In the latter case, the value of the -Xmx option has a significant effect on how quickly soft references are garbage collected.
+    设置软可达对象在上次被引用后在堆上保持活动状态的时间量（以毫秒为单位）。 默认值是堆中每兆字节的生命周期一秒。 -XX:SoftRefLRUPolicyMSPerMB 选项接受整数值，表示当前堆大小（对于 Java HotSpot Client VM）或最大可能堆大小（对于 Java HotSpot Server VM）每兆字节的毫秒数。 这种差异意味着客户端 VM 倾向于刷新软引用而不是增大堆，而服务器 VM 倾向于增大堆而不是刷新软引用。 在后一种情况下，-Xmx 选项的值对软引用的垃圾回收速度有重大影响。
+
+
+    The following example shows how to set the value to 2.5 seconds:
+    以下示例显示如何将值设置为 2.5 秒：
+
+        -XX:SoftRefLRUPolicyMSPerMB=2500
+- **-XX:StringDeduplicationAgeThreshold=threshold**
+    String objects reaching the specified age are considered candidates for deduplication. An object's age is a measure of how many times it has survived garbage collection. This is sometimes referred to as tenuring; see the -XX:+PrintTenuringDistribution option. Note that String objects that are promoted to an old heap region before this age has been reached are always considered candidates for deduplication. The default value for this option is 3. See the -XX:+UseStringDeduplication option.
+    达到指定年龄的字符串对象被视为重复数据删除的候选对象。 一个对象的年龄是衡量它在垃圾收集中幸存下来的次数。 这有时被称为任期； 请参阅 `-XX:+PrintTenuringDistribution` 选项。 请注意，在达到此年龄之前提升到旧堆区域的 String 对象始终被视为重复数据删除的候选对象。 此选项的默认值为 3。请参阅 `-XX:+UseStringDeduplication` 选项。
+
+- **-XX:SurvivorRatio=ratio**
+    Sets the ratio between eden space size and survivor space size. By default, this option is set to 8. The following example shows how to set the eden/survivor space ratio to 4:
+    设置伊甸园空间大小和幸存者空间大小之间的比率。默认情况下，此选项设置为 8。以下示例显示如何将 eden/survivor 空间比率设置为 4：
+
+        -XX:SurvivorRatio=4
+- **-XX:TargetSurvivorRatio=percent**
+    Sets the desired percentage of survivor space (0 to 100) used after young garbage collection. By default, this option is set to 50%.
+    设置年轻垃圾收集后使用的所需幸存者空间百分比（0 到 100）。默认情况下，此选项设置为 50%。
+
+    The following example shows how to set the target survivor space ratio to 30%:
+    以下示例显示如何将目标幸存者空间比率设置为 30%：
+
+        -XX:TargetSurvivorRatio=30
+- **-XX:TLABSize=size**
+    Sets the initial size (in bytes) of a thread-local allocation buffer (TLAB). Append the letter k or K to indicate kilobytes, m or M to indicate megabytes, g or G to indicate gigabytes. If this option is set to 0, then the JVM chooses the initial size automatically.
+    设置线程本地分配缓冲区 (TLAB) 的初始大小（以字节为单位）。附加字母k或K表示千字节，m或M表示兆字节，g或G表示千兆字节。如果此选项设置为 0，则 JVM 会自动选择初始大小。
+
+    The following example shows how to set the initial TLAB size to 512 KB:
+    以下示例显示如何将初始 TLAB 大小设置为 512 KB：
+
+        -XX:TLABSize=512k
+- **-XX:+UseAdaptiveSizePolicy**
+    Enables the use of adaptive generation sizing. This option is enabled by default. To disable adaptive generation sizing, specify -XX:-UseAdaptiveSizePolicy and set the size of the memory allocation pool explicitly (see the -XX:SurvivorRatio option).
+    启用自适应生成大小调整的使用。默认情况下启用此选项。要禁用自适应生成大小调整，请明确指定`-XX:-UseAdaptiveSizePolicy`和设置内存分配池的大小（请参阅`-XX:SurvivorRatio`选项）。
+
+- **-XX:+UseCMSInitiatingOccupancyOnly**
+    Enables the use of the occupancy value as the only criterion for initiating the CMS collector. By default, this option is disabled and other criteria may be used.
+    允许使用占用值作为启动 CMS 收集器的唯一标准。默认情况下，此选项被禁用，可以使用其他标准。
+
+- **-XX:+UseConcMarkSweepGC**
+    Enables the use of the CMS garbage collector for the old generation. Oracle recommends that you use the CMS garbage collector when application latency requirements cannot be met by the throughput (-XX:+UseParallelGC) garbage collector. The G1 garbage collector (-XX:+UseG1GC) is another alternative.
+    为老年代启用 CMS 垃圾收集器。 当吞吐量 (-XX:+UseParallelGC) 垃圾收集器无法满足应用程序延迟要求时，Oracle 建议您使用 CMS 垃圾收集器。 G1 垃圾收集器 (-XX:+UseG1GC) 是另一种选择。
+
+    By default, this option is disabled and the collector is chosen automatically based on the configuration of the machine and type of the JVM. When this option is enabled, the -XX:+UseParNewGC option is automatically set and you should not disable it, because the following combination of options has been deprecated in JDK 8: -XX:+UseConcMarkSweepGC -XX:-UseParNewGC.
+    默认情况下，这个选项是禁用的，收集器是根据机器的配置和 JVM 的类型自动选择的。 启用此选项后，将自动设置 `-XX:+UseParNewGC` 选项，您不应禁用它，因为在 JDK 8 中已弃用以下选项组合：`-XX:+UseConcMarkSweepGC -XX:-UseParNewGC`。
+
+- **-XX:+UseG1GC**
+    Enables the use of the garbage-first (G1) garbage collector. It is a server-style garbage collector, targeted for multiprocessor machines with a large amount of RAM. It meets GC pause time goals with high probability, while maintaining good throughput. The G1 collector is recommended for applications requiring large heaps (sizes of around 6 GB or larger) with limited GC latency requirements (stable and predictable pause time below 0.5 seconds).
+    启用垃圾优先 (G1) 垃圾收集器的使用。 它是一种服务器风格的垃圾收集器，针对具有大量 RAM 的多处理器机器。 它很有可能满足 GC 暂停时间目标，同时保持良好的吞吐量。 建议将 G1 收集器用于需要大堆（大小约为 6 GB 或更大）且 GC 延迟要求有限（稳定且可预测的暂停时间低于 0.5 秒）的应用程序。
+
+    By default, this option is disabled and the collector is chosen automatically based on the configuration of the machine and type of the JVM.
+    默认情况下，这个选项是禁用的，收集器是根据机器的配置和 JVM 的类型自动选择的。
+
+- **-XX:+UseGCOverheadLimit**
+    Enables the use of a policy that limits the proportion of time spent by the JVM on GC before an OutOfMemoryError exception is thrown. This option is enabled, by default and the parallel GC will throw an OutOfMemoryError if more than 98% of the total time is spent on garbage collection and less than 2% of the heap is recovered. When the heap is small, this feature can be used to prevent applications from running for long periods of time with little or no progress. To disable this option, specify `-XX:-UseGCOverheadLimit`.
+    在抛出 OutOfMemoryError 异常之前，允许使用限制 JVM 在 GC 上花费的时间比例的策略。 默认情况下启用此选项，如果超过 98% 的总时间花在垃圾收集上并且回收不到 2% 的堆，则并行 GC 将抛出 OutOfMemoryError。 当堆很小时，可以使用此功能来防止应用程序长时间运行而没有任何进展。 要禁用此选项，请指定 `-XX:-UseGCOverheadLimit`。
+
+- **-XX:+UseNUMA**
+    Enables performance optimization of an application on a machine with nonuniform memory architecture (NUMA) by increasing the application's use of lower latency memory. By default, this option is disabled and no optimization for NUMA is made. The option is only available when the parallel garbage collector is used (-XX:+UseParallelGC).
+    通过增加应用程序对低延迟内存的使用，在具有非统一内存架构 (NUMA) 的机器上启用应用程序的性能优化。 默认情况下，此选项被禁用，并且不对 NUMA 进行优化。 该选项仅在使用并行垃圾收集器时可用 (`-XX:+UseParallelGC`)。
+
+- **-XX:+UseParallelGC**
+    Enables the use of the parallel scavenge garbage collector (also known as the throughput collector) to improve the performance of your application by leveraging multiple processors.
+    启用并行清除垃圾收集器（也称为吞吐量收集器）以通过利用多个处理器来提高应用程序的性能。
+
+    By default, this option is disabled and the collector is chosen automatically based on the configuration of the machine and type of the JVM. If it is enabled, then the -XX:+UseParallelOldGC option is automatically enabled, unless you explicitly disable it.
+    默认情况下，这个选项是禁用的，收集器是根据机器的配置和 JVM 的类型自动选择的。 如果启用，则 `-XX:+UseParallelOldGC` 选项会自动启用，除非您明确禁用它。
+
+- **-XX:+UseParallelOldGC**
+    Enables the use of the parallel garbage collector for full GCs. By default, this option is disabled. Enabling it automatically enables the -XX:+UseParallelGC option.
+    启用对完整 GC 的并行垃圾收集器的使用。 默认情况下，此选项被禁用。 启用它会自动启用 -XX:+UseParallelGC 选项。
+
+- **-XX:+UseParNewGC**
+    Enables the use of parallel threads for collection in the young generation. By default, this option is disabled. It is automatically enabled when you set the -XX:+UseConcMarkSweepGC option. Using the -XX:+UseParNewGC option without the -XX:+UseConcMarkSweepGC option was deprecated in JDK 8.
+    启用在年轻代中使用并行线程进行收集。 默认情况下，此选项被禁用。 当您设置 `-XX:+UseConcMarkSweepGC` 选项时，它会自动启用。 在 JDK 8 中不推荐使用不带 `-XX:+UseConcMarkSweepGC` 选项的 `-XX:+UseParNewGC` 选项。
+
+- **-XX:+UseSerialGC**
+    Enables the use of the serial garbage collector. This is generally the best choice for small and simple applications that do not require any special functionality from garbage collection. By default, this option is disabled and the collector is chosen automatically based on the configuration of the machine and type of the JVM.
+    启用串行垃圾收集器的使用。 这通常是不需要垃圾收集的任何特殊功能的小型和简单应用程序的最佳选择。 默认情况下，这个选项是禁用的，收集器是根据机器的配置和 JVM 的类型自动选择的。
+
+- **-XX:+UseSHM**
+    On Linux, enables the JVM to use shared memory to setup large pages.
+    在 Linux 上，使 JVM 能够使用共享内存来设置大页面。
+
+    For more information, see "Large Pages".
+
+- **-XX:+UseStringDeduplication**
+    Enables string deduplication. By default, this option is disabled. To use this option, you must enable the garbage-first (G1) garbage collector. See the -XX:+UseG1GC option.
+    启用字符串去重。 默认情况下，此选项被禁用。 要使用此选项，您必须启用垃圾优先 (G1) 垃圾收集器。 请参阅 -XX:+UseG1GC 选项。
+
+    String deduplication reduces the memory footprint of String objects on the Java heap by taking advantage of the fact that many String objects are identical. Instead of each String object pointing to its own character array, identical String objects can point to and share the same character array.
+    字符串重复数据删除利用许多 String 对象相同这一事实减少了 Java 堆上 String 对象的内存占用。 相同的 String 对象可以指向并共享同一个字符数组，而不是每个 String 对象都指向它自己的字符数组。
+
+- **-XX:+UseTLAB**
+    Enables the use of thread-local allocation blocks (TLABs) in the young generation space. This option is enabled by default. To disable the use of TLABs, specify `-XX:-UseTLAB`.
+    启用在新生代空间中使用线程本地分配块 (TLAB)。 默认情况下启用此选项。 要禁用 TLAB，请指定 `-XX:-UseTLAB`。
+------------------------
+弃用的命令就不再列出，主要是针对有需要查看命令的小伙伴可以查看
